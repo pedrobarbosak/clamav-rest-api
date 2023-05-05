@@ -73,7 +73,7 @@ func ScanFile(file multipart.File, header *multipart.FileHeader) (*Result, error
 		result.Code = http.StatusNotAcceptable
 
 	case clamd.RES_ERROR:
-		result.Code = http.StatusBadRequest
+		result.Code = http.StatusExpectationFailed
 
 	case clamd.RES_PARSE_ERROR:
 		result.Code = http.StatusPreconditionFailed
