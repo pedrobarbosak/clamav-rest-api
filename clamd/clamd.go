@@ -56,13 +56,13 @@ func ScanFile(file multipart.File, header *multipart.FileHeader) (*Result, error
 	response := <-resultCh
 
 	result := &Result{
-		contentType: header.Header.Get("Content-Type"),
-		filename:    header.Filename,
-		size:        header.Size,
+		ContentType: header.Header.Get("Content-Type"),
+		Filename:    header.Filename,
+		Size:        header.Size,
 
-		status:      response.Status,
-		hash:        response.Hash,
-		description: response.Description,
+		Status:      response.Status,
+		Hash:        response.Hash,
+		Description: response.Description,
 	}
 
 	switch response.Status {
@@ -79,10 +79,10 @@ func ScanFile(file multipart.File, header *multipart.FileHeader) (*Result, error
 		result.Code = http.StatusPreconditionFailed
 
 	default:
-		log.Println(result.String())
+		log.Println(result)
 		return nil, errors.New(fmt.Sprintf("unrecognized result status: %v", response))
 	}
 
-	log.Println(result.String())
+	log.Println(result)
 	return result, nil
 }

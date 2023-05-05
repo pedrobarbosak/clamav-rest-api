@@ -1,26 +1,21 @@
 package clamd
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
 type Result struct {
-	Code int
+	Code int `json:"code"`
 
-	filename    string
-	size        int64
-	contentType string
+	Filename    string `json:"filename"`
+	Size        int64  `json:"size"`
+	ContentType string `json:"contentType"`
 
-	status      string
-	hash        string
-	description string
+	Status      string `json:"status"`
+	Hash        string `json:"hash"`
+	Description string `json:"description"`
 }
 
 func (r Result) String() string {
-	return fmt.Sprintf("[-] %s (%d) [%s]: '%s' %s %s", r.filename, r.size, r.contentType, r.status, r.hash, r.description)
-}
-
-func (r Result) JSON() ([]byte, error) {
-	return json.Marshal(r)
+	return fmt.Sprintf("[-] %s (%d) [%s]: '%s' %s %s", r.Filename, r.Size, r.ContentType, r.Status, r.Hash, r.Description)
 }

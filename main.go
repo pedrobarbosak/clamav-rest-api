@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -49,13 +50,7 @@ func scan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json, err := result.JSON()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(result.Code)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	w.WriteHeader(result.Code)
+	json.NewEncoder(w).Encode(result)
 }
