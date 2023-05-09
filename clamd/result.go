@@ -8,7 +8,6 @@ type Result struct {
 	Code int `json:"code"`
 
 	Filename    string `json:"filename"`
-	Size        int64  `json:"size"`
 	ContentType string `json:"contentType"`
 
 	Status      string `json:"status"`
@@ -17,5 +16,17 @@ type Result struct {
 }
 
 func (r Result) String() string {
-	return fmt.Sprintf("[-] %s (%d) [%s]: '%s' %s %s", r.Filename, r.Size, r.ContentType, r.Status, r.Hash, r.Description)
+	return fmt.Sprintf("[-] %s [%s]: '%s' %s %s", r.Filename, r.ContentType, r.Status, r.Hash, r.Description)
+}
+
+func (r Result) JSON() any {
+	return fmt.Sprintf(`
+		{ 
+			"code": "%s",
+			"filename":	"%s",
+			"contentType": "%s",
+			"status": "%s",
+			"hash": "%s",
+			"description": "%s"
+		}`, r.Code, r.Filename, r.ContentType, r.Status, r.Hash, r.Description)
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -37,20 +37,35 @@ func scan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, fileHeader, err := r.FormFile("file")
+	reader, err := r.MultipartReader()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
 
-	result, err := clamd.ScanFile(file, fileHeader)
-	if err != nil {
-		w.WriteHeader(http.StatusServiceUnavailable)
+	for {
+		part, err := reader.NextPart()
+		if err == io.EOF {
+			break
+		}
+
+		if part.FileName() == "" {
+			continue
+		}
+
+		result, err := clamd.ScanFile(part)
+		if err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			return
+		}
+
+		_ = part.Close()
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(result.Code)
+		fmt.Fprint(w, result.JSON())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(result.Code)
-	json.NewEncoder(w).Encode(result)
+	http.Error(w, "no file", http.StatusBadRequest)
 }

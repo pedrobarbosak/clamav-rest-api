@@ -19,8 +19,8 @@ func CheckConnection() error {
 	clam := New()
 
 	var err error
-	for i := 0; i < 3; i++ {
-		time.Sleep(time.Second * 3)
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Second * 5)
 
 		err = clam.Ping()
 		if err != nil {
@@ -44,26 +44,30 @@ func CheckConnection() error {
 	return err
 }
 
-func ScanFile(file multipart.File, header *multipart.FileHeader) (*Result, error) {
+func ScanFile(file *multipart.Part) (*Result, error) {
 	clam := New()
 
-	resultCh, err := clam.ScanStream(file, nil)
+	log.Printf("scanning: %s...\n", file.FileName())
+
+	var abort chan bool
+	resultCh, err := clam.ScanStream(file, abort)
 	if err != nil {
-		log.Printf("failed to scan: %s (%d) %s - %s\n", header.Filename, header.Size, header.Header, err)
+		log.Printf("failed to scan: %s (%d) %s - %s\n", file.FileName(), 0, file.Header, err)
 		return nil, err
 	}
 
 	response := <-resultCh
 
 	result := &Result{
-		ContentType: header.Header.Get("Content-Type"),
-		Filename:    header.Filename,
-		Size:        header.Size,
+		ContentType: file.Header.Get("Content-Type"),
+		Filename:    file.FileName(),
 
 		Status:      response.Status,
 		Hash:        response.Hash,
 		Description: response.Description,
 	}
+
+	defer log.Println(result)
 
 	switch response.Status {
 	case clamd.RES_OK:
@@ -79,10 +83,8 @@ func ScanFile(file multipart.File, header *multipart.FileHeader) (*Result, error
 		result.Code = http.StatusPreconditionFailed
 
 	default:
-		log.Println(result)
 		return nil, errors.New(fmt.Sprintf("unrecognized result status: %v", response))
 	}
 
-	log.Println(result)
 	return result, nil
 }
