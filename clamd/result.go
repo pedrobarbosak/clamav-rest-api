@@ -22,7 +22,7 @@ func (r Result) String() string {
 func (r Result) JSON() any {
 	return fmt.Sprintf(`
 		{ 
-			"code": "%s",
+			"code": %d,
 			"filename":	"%s",
 			"contentType": "%s",
 			"status": "%s",
