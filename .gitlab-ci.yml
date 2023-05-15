@@ -1,15 +1,18 @@
+image: docker:19.03.1
+services:
+  - docker:19.03.1-dind
+
 stages:
   - deploy
 
+variables:
+  CONTAINER_IMAGE: $GITLAB_CONTAINER_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
+
 deploy-job:
   stage: deploy
-  image: docker:19.03.1
-  services:
-    - docker:19.03.1-dind
-  only:
-    - tags
   script:
     - docker login -u $GITLAB_CONTAINER_REGISTRY_USER -p $GITLAB_CONTAINER_REGISTRY_PASS $GITLAB_CONTAINER_REGISTRY
-    - docker build -t $GITLAB_CONTAINER_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA -t $GITLAB_CONTAINER_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest .
-    - docker push $GITLAB_CONTAINER_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
-
+    - docker build -t $CONTAINER_IMAGE .
+    - docker push $CONTAINER_IMAGE
+  only:
+    - tags
