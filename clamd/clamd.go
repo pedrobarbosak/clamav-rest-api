@@ -12,6 +12,10 @@ import (
 )
 
 func New() *clamd.Clamd {
+	return clamd.NewClamd("/var/run/clamav/clamd.sock")
+}
+
+func NewTCP() *clamd.Clamd {
 	return clamd.NewClamd("tcp://localhost:3310")
 }
 
@@ -22,8 +26,7 @@ func CheckConnection() error {
 	for i := 0; i < 10; i++ {
 		time.Sleep(time.Second * 5)
 
-		err = clam.Ping()
-		if err != nil {
+		if err = clam.Ping(); err != nil {
 			log.Println("failed to ping:", err)
 			continue
 		}
@@ -47,10 +50,9 @@ func CheckConnection() error {
 func ScanFile(file *multipart.Part) (*Result, error) {
 	clam := New()
 
-	log.Printf("scanning: %s...\n", file.FileName())
+	log.Printf("scanning: %s ...\n", file.FileName())
 
-	var abort chan bool
-	resultCh, err := clam.ScanStream(file, abort)
+	resultCh, err := clam.ScanStream(file, make(chan bool))
 	if err != nil {
 		log.Printf("failed to scan: %s (%d) %s - %s\n", file.FileName(), 0, file.Header, err)
 		return nil, err
@@ -85,6 +87,6 @@ func ScanFile(file *multipart.Part) (*Result, error) {
 	default:
 		return nil, errors.New(fmt.Sprintf("unrecognized result status: %v", response))
 	}
-
+  
 	return result, nil
 }
