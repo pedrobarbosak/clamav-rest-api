@@ -10,12 +10,12 @@ Standalone docker image that runs and provides a rest api on top of the open sou
 
 Run docker image:
 ```bash
-docker run -p 8080:8080 --rm -it registry.gitlab.com/losch-digital-lab/clamav
+docker run -p 8080:8080 --rm -it pedrobarbosak/clamav-rest-api
 ```
 
 You can change the port using the environment variable `PORT` if needed:
 ```bash
-docker run -p 8080:{your-port} -e "PORT={your-port}" --rm -it registry.gitlab.com/losch-digital-lab/clamav
+docker run -p 8080:{your-port} -e "PORT={your-port}" --rm -it pedrobarbosak/clamav-rest-api
 ```
 
 ### Check if api is running:
@@ -72,8 +72,8 @@ Content-Length: 128
 
 Build and run docker image locally:
 ```bash
-docker build --no-cache -t registry.gitlab.com/losch-digital-lab/clamav .
-docker run -p 8080:8080 --rm -it registry.gitlab.com/losch-digital-lab/clamav
+docker build --no-cache -t pedrobarbosak/clamav-rest-api .
+docker run -p 8080:8080 --rm -it pedrobarbosak/clamav-rest-api
 ```
 
 Or in one line:
