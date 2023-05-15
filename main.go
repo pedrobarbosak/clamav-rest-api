@@ -32,7 +32,7 @@ func pong(w http.ResponseWriter, r *http.Request) {
 }
 
 func scan(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -50,6 +50,7 @@ func scan(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if part.FileName() == "" {
+			_ = part.Close()
 			continue
 		}
 
@@ -63,7 +64,7 @@ func scan(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(result.Code)
-		fmt.Fprint(w, result.JSON())
+		_, _ = fmt.Fprint(w, result.JSON())
 		return
 	}
 

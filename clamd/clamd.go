@@ -1,7 +1,6 @@
 package clamd
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"mime/multipart"
@@ -22,17 +21,15 @@ func NewTCP() *clamd.Clamd {
 func CheckConnection() error {
 	clam := New()
 
-	var err error
 	for i := 0; i < 10; i++ {
-		time.Sleep(time.Second * 5)
+		time.Sleep(5 * time.Second)
 
-		if err = clam.Ping(); err != nil {
+		if err := clam.Ping(); err != nil {
 			log.Println("failed to ping:", err)
 			continue
 		}
 
-		var result chan *clamd.ScanResult
-		result, err = clam.Version()
+		result, err := clam.Version()
 		if err != nil {
 			log.Println("failed to get version:", err)
 			continue
@@ -44,7 +41,7 @@ func CheckConnection() error {
 		return nil
 	}
 
-	return err
+	return fmt.Errorf("failed to establish connection")
 }
 
 func ScanFile(file *multipart.Part) (*Result, error) {
@@ -85,8 +82,8 @@ func ScanFile(file *multipart.Part) (*Result, error) {
 		result.Code = http.StatusPreconditionFailed
 
 	default:
-		return nil, errors.New(fmt.Sprintf("unrecognized result status: %v", response))
+		return nil, fmt.Errorf("unrecognized result status: %v", response)
 	}
-  
+
 	return result, nil
 }
