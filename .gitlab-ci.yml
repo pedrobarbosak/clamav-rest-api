@@ -6,12 +6,13 @@ stages:
   - deploy
 
 variables:
-  CONTAINER_IMAGE: $GITLAB_CONTAINER_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
+  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:latest
 
 deploy-job:
   stage: deploy
   script:
-    - docker login -u $GITLAB_CONTAINER_REGISTRY_USER -p $GITLAB_CONTAINER_REGISTRY_PASS $GITLAB_CONTAINER_REGISTRY
+    - echo $CI_REGISTRY_IMAGE
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CONTAINER_IMAGE .
     - docker push $CONTAINER_IMAGE
   only:
